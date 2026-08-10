@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Price Prediction{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Areca Nut Price Prediction</h2>
+    <p class="subtitle">Get AI-powered price predictions with trend analysis</p>
+
+    <div class="form-container">
+        <form id="priceForm">
+            <div class="form-group">
+                <label for="district">District</label>
+                <select id="district" name="district" required>
+                    <option value="" disabled selected>Select district</option>
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Belgaum">Belgaum</option>
+                    <option value="Chamrajnagar">Chamrajnagar</option>
+                    <option value="Chikmagalur">Chikmagalur</option>
+                    <option value="Chitradurga">Chitradurga</option>
+                    <option value="Davangere">Davangere</option>
+                    <option value="Hassan">Hassan</option>
+                    <option value="Haveri">Haveri</option>
+                    <option value="Karwar">Karwar</option>
+                    <option value="Kolar">Kolar</option>
+                    <option value="Madikeri">Madikeri</option>
+                    <option value="Mandya">Mandya</option>
+                    <option value="Mangalore">Mangalore</option>
+                    <option value="Mysore">Mysore</option>
+                    <option value="Shimoga">Shimoga</option>
+                    <option value="Tumkur">Tumkur</option>
+                    <option value="Udupi">Udupi</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="variety">Areca Nut Type</label>
+                <select id="variety" name="variety" required>
+                    <option value="" disabled selected>Select type</option>
+                    <option value="Bette">Bette</option>
+                    <option value="Bilegotu">Bilegotu</option>
+                    <option value="Chali">Chali</option>
+                    <option value="Chippu">Chippu</option>
+                    <option value="Churu">Churu</option>
+                    <option value="Cqca">Cqca</option>
+                    <option value="EDI">EDI</option>
+                    <option value="Factory">Factory</option>
+                    <option value="Gorabalu">Gorabalu</option>
+                    <option value="Kempugotu">Kempugotu</option>
+                    <option value="Kole">Kole</option>
+                    <option value="New Variety">New Variety</option>
+                    <option value="Other">Other</option>
+                    <option value="Pudi">Pudi</option>
+                    <option value="Pylone">Pylone</option>
+                    <option value="Rashi">Rashi</option>
+                    <option value="Raw">Raw</option>
+                    <option value="Red">Red</option>
+                    <option value="Ripe">Ripe</option>
+                    <option value="Saraku">Saraku</option>
+                    <option value="Sippegotu">Sippegotu</option>
+                    <option value="Supari">Supari</option>
+                    <option value="Tattibettee">Tattibettee</option>
+                    <option value="api">api</option>
+                </select>
+
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary btn-full-width">Predict Price</button>
+        </form>
+    </div>
+
+    <div id="results" class="results-box" style="display:none;">
+        <h3>Prediction Results</h3>
+        <p>Predicted Price:</p>
+        <h3 id="predictedPrice" style="margin-bottom: 1.5rem;"></h3>
+
+        <h4>AI-Generated Reasoning</h4>
+        <p id="aiReasoning" class="reasoning-text"></p>
+
+        <h4>Price Trend Graph</h4>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <canvas id="priceChart" width="400" height="200"></canvas>
+    </div>
+</main>
+
+<script>
+    let priceChart; // Store chart object to destroy it before redrawing
+    document.getElementById('priceForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const data = {
+            district: document.getElementById('district').value,
+            variety: document.getElementById('variety').value,
+            date: document.getElementById('date').value
+        };
+
+        const response = await fetch('/api/predict_price', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const results = await response.json();
+
+        if (results.error) {
+            alert(results.error);
+        } else {
+            document.getElementById('predictedPrice').innerText = `₹ ${results.price}`;
+            document.getElementById('aiReasoning').innerText = results.reasoning;
+            document.getElementById('results').style.display = 'block';
+
+            // Render graph
+            const ctx = document.getElementById('priceChart').getContext('2d');
+
+            // Destroy old chart if it exists
+            if (priceChart) {
+                priceChart.destroy();
+            }
+
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: results.graph.map(p => p.date),
+                    datasets: [{
+                        label: 'Predicted Price Trend',
+                        data: results.graph.map(p => p.price),
+                        borderColor: 'var(--primary-green)',
+                        backgroundColor: 'var(--primary-green-light)',
+                        fill: false
+                    }]
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

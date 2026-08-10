@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>{% block title %}Agro Nova{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('home') }}" style="text-decoration:none; color:inherit;">Agro Nova</a></h1>
+        <nav>
+            <a href="{{ url_for('price_prediction_page') }}">Price Prediction</a>
+            <a href="{{ url_for('soil_analysis_page') }}">Soil Analysis</a>
+            <a href="{{ url_for('disease_detection_page') }}">Disease Detection</a>
+            <a href="{{ url_for('expert_chatbot_page') }}">Ask Expert</a>
+        </nav>
+        <div class="header-auth">
+            {% if session.logged_in %}
+                <span style="padding: 0.65rem 0;">Welcome, {{ session.username }}!</span>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Sign Out</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn btn-secondary">Sign In</a>
+                <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign Up</a>
+            {% endif %}
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+</body>
+</html>

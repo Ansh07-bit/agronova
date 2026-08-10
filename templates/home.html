@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Welcome to Agro Nova{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Welcome to Agro Nova</h2>
+    <p class="subtitle">Revolutionizing areca nut farming with AI-powered predictions, soil analysis, and expert guidance</p>
+
+    <div class="card-grid">
+        <a href="{{ url_for('price_prediction_page') }}" class="card">
+            <h3>Price Prediction</h3>
+            <p>Predict areca nut prices with AI-powered analysis and historical trends.</p>
+            <span class="learn-more">Learn more &rarr;</span>
+        </a>
+        <a href="{{ url_for('soil_analysis_page') }}" class="card">
+            <h3>Soil Suitability</h3>
+            <p>Analyze soil conditions to determine optimal planting opportunities.</p>
+            <span class="learn-more">Learn more &rarr;</span>
+        </a>
+        <a href="{{ url_for('disease_detection_page') }}" class="card">
+            <h3>Disease Detection</h3>
+            <p>Identify plant diseases and assess nut quality with image analysis.</p>
+            <span class="learn-more">Learn more &rarr;</span>
+        </a>
+        <a href="{{ url_for('expert_chatbot_page') }}" class="card">
+            <h3>Expert Chatbot</h3>
+            <p>Get instant answers to your agricultural questions 24/7.</p>
+            <span class="learn-more">Learn more &rarr;</span>
+        </a>
+    </div>
+</main>
+{% endblock %}

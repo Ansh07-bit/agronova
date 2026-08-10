@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Disease & Quality Analysis{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Disease Detection & Quality Analysis</h2>
+    <p class="subtitle">Upload plant images and click Analyze to detect diseases or nut quality.</p>
+
+    <div class="upload-columns">
+
+        <!-- LEFT SIDE : DISEASE MODELS -->
+        <div class="disease-section">
+            <h3>Plant Disease Detection</h3>
+
+            <!-- Leaf -->
+            <div class="analysis-block">
+                <label class="upload-box">
+                    Leaf Image<br><span class="file-name">No file chosen</span>
+                    <input type="file" class="image-input" data-type="leaf" accept="image/*">
+                </label>
+                <button class="analyze-btn" data-type="leaf">Analyze Leaf</button>
+            </div>
+
+            <!-- Trunk -->
+            <div class="analysis-block">
+                <label class="upload-box">
+                    Trunk Image<br><span class="file-name">No file chosen</span>
+                    <input type="file" class="image-input" data-type="trunk" accept="image/*">
+                </label>
+                <button class="analyze-btn" data-type="trunk">Analyze Trunk</button>
+            </div>
+
+            <!-- Crop -->
+            <div class="analysis-block">
+                <label class="upload-box">
+                    Crop Image<br><span class="file-name">No file chosen</span>
+                    <input type="file" class="image-input" data-type="crop" accept="image/*">
+                </label>
+                <button class="analyze-btn" data-type="crop">Analyze Crop</button>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE : NUT QUALITY -->
+        <div class="disease-section">
+            <h3>Nut Quality Assessment</h3>
+
+            <div class="analysis-block">
+                <label class="upload-box">
+                    Nut Image<br><span class="file-name">No file chosen</span>
+                    <input type="file" class="image-input" data-type="nut_quality" accept="image/*">
+                </label>
+                <button class="analyze-btn" data-type="nut_quality">Analyze Nut</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTS -->
+    <h3>Analysis Results</h3>
+    <div id="resultsContainer" class="results-box">
+        <p>No analysis yet. Upload an image and click Analyze.</p>
+    </div>
+</main>
+
+<script>
+let uploadedFiles = {};  // store files for each model type
+
+document.querySelectorAll(".image-input").forEach(input => {
+    input.addEventListener("change", () => {
+        const file = input.files[0];
+        const type = input.dataset.type;
+        const fileNameLabel = input.parentElement.querySelector(".file-name");
+
+        if (file) {
+            uploadedFiles[type] = file;
+            fileNameLabel.textContent = file.name;
+        }
+    });
+});
+
+document.querySelectorAll(".analyze-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+        const type = btn.dataset.type;
+        const file = uploadedFiles[type];
+
+        if (!file) {
+            alert("Please upload an image before analyzing!");
+            return;
+        }
+
+        btn.textContent = "Analyzing...";
+        btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append("disease_image", file);
+        formData.append("type", type);
+
+        const response = await fetch("/api/detect_disease", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        btn.textContent = "Analyze " + type.replace("_", " ");
+        btn.disabled = false;
+
+        const resultsContainer = document.getElementById("resultsContainer");
+        if (resultsContainer.querySelector("p")) {
+            resultsContainer.innerHTML = "";
+        }
+
+        const resultDiv = document.createElement("div");
+        resultDiv.classList.add("single-result");
+
+        if (data.error) {
+            resultDiv.innerHTML = `
+                <h4>${type.replace("_", " ")} (${file.name})</h4>
+                <p><strong>Error:</strong> ${data.error}</p>
+                <hr>
+            `;
+        } else {
+            resultDiv.innerHTML = `
+                <h4>${type.replace("_", " ")} (${file.name})</h4>
+                <p><strong>Prediction:</strong> ${data.result}</p>
+                <p><strong>Confidence:</strong> ${data.confidence}%</p>
+                <p><strong>AI Insight:</strong> ${data.reasoning}</p>
+                <hr>
+            `;
+        }
+
+        resultsContainer.prepend(resultDiv);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Expert Chatbot{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Ask Our Expert</h2>
+    <p class="subtitle">Get instant answers to your areca nut farming questions</p>
+
+    <div id="chatbox">
+        <div class="chat-msg bot-msg">
+            <p>Hello! I'm your Agro Nova expert assistant. How can I help you with areca nut farming today?</p>
+        </div>
+    </div>
+    
+    <form id="chatForm">
+        <input type="text" id="message" placeholder="Ask about areca nut farming..." autocomplete="off">
+        <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+</main>
+
+<script>
+    document.getElementById('chatForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const input = document.getElementById('message');
+        const message = input.value;
+        if (!message) return;
+
+        const chatbox = document.getElementById('chatbox');
+
+        // 1. Display user message
+        chatbox.innerHTML += `<div class="chat-msg user-msg"><p>${message}</p></div>`;
+        input.value = ''; // Clear input
+        chatbox.scrollTop = chatbox.scrollHeight; // Auto-scroll
+
+        // 2. Fetch bot reply
+        const response = await fetch('/api/expert_chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: message })
+        });
+
+        const data = await response.json();
+
+        // 3. Display bot reply
+        chatbox.innerHTML += `<div class="chat-msg bot-msg"><p>${data.reply}</p></div>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+    });
+</script>
+{% endblock %}

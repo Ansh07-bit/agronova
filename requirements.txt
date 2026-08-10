@@ -1,0 +1,10 @@
+Flask
+Werkzeug
+pandas
+numpy
+xgboost
+scikit-learn
+tensorflow
+Pillow
+huggingface_hub
+google-genai

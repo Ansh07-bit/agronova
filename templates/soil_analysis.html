@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Soil Analysis{% endblock %}
+
+{% block content %}
+<main>
+    <h2>Soil Suitability Analysis</h2>
+    <p class="subtitle">Upload a soil image to determine if it's suitable for areca nut plantation</p>
+
+    <div class="form-container">
+        <form id="soilForm">
+            <div class="form-group">
+                <label for="soil_image" class="upload-box">
+                    <p>Click to upload or drag and drop</p>
+                    <span id="soil-file-name">No file selected</span>
+                </label>
+                <input type="file" id="soil_image" name="soil_image" accept="image/*" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full-width">Analyze Soil</button>
+        </form>
+    </div>
+
+    <div id="results" class="results-box" style="display:none;">
+        <h3>Analysis Result</h3>
+        <p id="mlResult"></p>
+        <h4>AI Expert Analysis</h4>
+        <p id="aiReasoning" class="reasoning-text"></p>
+    </div>
+</main>
+
+<script>
+    document.getElementById('soil_image').addEventListener('change', function() {
+        document.getElementById('soil-file-name').innerText = this.files[0].name;
+    });
+
+    document.getElementById('soilForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('soil_image', document.getElementById('soil_image').files[0]);
+
+        // Show a loading state
+        const resultsBox = document.getElementById('results');
+        resultsBox.style.display = 'block';
+        document.getElementById('mlResult').innerText = 'Analyzing...';
+        document.getElementById('aiReasoning').innerText = 'Generating expert reasoning...';
+
+        const response = await fetch('/api/analyze_soil', {
+            method: 'POST',
+            body: formData
+        });
+
+        const results = await response.json();
+        
+        document.getElementById('mlResult').innerText = results.result;
+        document.getElementById('aiReasoning').innerText = results.reasoning;
+    });
+</script>
+{% endblock %}
