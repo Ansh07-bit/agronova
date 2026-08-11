@@ -237,7 +237,8 @@ AgroNova is currently under development and is being prepared for cloud deployme
 
 **Ansh**
 
-GitHub: `https://github.com/Ansh07-bit`
+GitHub: 
 
 ```
+https://github.com/Ansh07-bit
 ```
