@@ -1,3 +1,4 @@
+```python
 import os
 import tempfile
 import sqlite3
@@ -67,33 +68,6 @@ DB_PATH = os.environ.get("DB_PATH", "users.db")
 app = Flask(__name__)
 app.secret_key = FLASK_SECRET_KEY
 
-DB_PATH = "users.db"
-
-
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def init_db():
-    conn = get_db()
-    cur = conn.cursor()
-
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL
-        )
-    """)
-
-    conn.commit()
-    conn.close()
-
-
-init_db()
 
 # ============================================================
 # GEMINI INITIALIZATION
@@ -139,7 +113,6 @@ def download_model(filename):
     except Exception as e:
         print(f"Failed to download {filename}: {e}")
         raise
-
 
 
 # ============================================================
@@ -1444,4 +1417,3 @@ if __name__ == "__main__":
         ),
         debug=True,
     )
-
