@@ -55,7 +55,7 @@ FLASK_SECRET_KEY = os.environ.get(
     "development-secret-change-this"
 )
 
-GEMINI_API_KEY = os.environ.get("AIzaSyCbFMePO5kP2nEZDP2PgFDlcdqrBapyxh4")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 DB_PATH = os.environ.get("DB_PATH", "users.db")
 
