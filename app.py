@@ -1,4 +1,5 @@
-```python
+from dotenv import load_dotenv
+load_dotenv()
 import os
 import tempfile
 import sqlite3
@@ -67,7 +68,33 @@ DB_PATH = os.environ.get("DB_PATH", "users.db")
 
 app = Flask(__name__)
 app.secret_key = FLASK_SECRET_KEY
+DB_PATH = "users.db"
 
+
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            email TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+init_db()
 
 # ============================================================
 # GEMINI INITIALIZATION
@@ -220,6 +247,27 @@ def get_nut_quality_model():
     except Exception as e:
         print("Nut quality model loading failed:", e)
         return None
+
+
+# ============================================================
+# PRELOAD ALL MODELS AT STARTUP
+# ============================================================
+# Since all loaders above are wrapped with @lru_cache, calling
+# them once here forces the download + load to happen right
+# now (at app startup / import time) instead of on the first
+# incoming request. Later calls anywhere else in the code just
+# return the cached model instantly.
+
+print("Preloading all models at startup, please wait...")
+
+get_price_model()
+get_soil_model()
+get_leaf_model()
+get_trunk_model()
+get_crop_model()
+get_nut_quality_model()
+
+print("All models preloaded.")
 
 
 # ============================================================

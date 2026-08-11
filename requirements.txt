@@ -8,3 +8,4 @@ tensorflow
 Pillow
 huggingface_hub
 google-genai
+python-dotenv
